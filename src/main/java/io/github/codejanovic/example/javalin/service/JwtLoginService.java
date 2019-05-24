@@ -25,7 +25,7 @@ public class JwtLoginService implements LoginService {
     @Override
     public Text login(Email email, Text passwordAsString) {
         final Optional<User> registeredUser = _userRepository.findByEmail(email);
-        if (registeredUser.isEmpty()) {
+        if (!registeredUser.isPresent()) {
             throw new UnauthorizedResponse("Login failed");
         }
         final Password hashedPassword = new PBKDF2Password(passwordAsString, registeredUser.get().salt());

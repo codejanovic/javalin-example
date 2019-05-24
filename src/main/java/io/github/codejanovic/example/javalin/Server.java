@@ -1,15 +1,23 @@
 package io.github.codejanovic.example.javalin;
 
 import io.github.codejanovic.example.javalin.auth.Roles;
+import io.github.codejanovic.example.javalin.inject.Injectable;
+import io.github.codejanovic.example.javalin.routes.LoginRoute;
+import io.github.codejanovic.example.javalin.routes.RegisterRoute;
 import io.javalin.Context;
 import io.javalin.Javalin;
+
+import javax.inject.Inject;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.security.SecurityUtil.roles;
 
 public class Server {
 
-    public static void main(String[] args) {
+    @Inject
+    Injectable _injectable;
+
+    public void start() {
         Javalin app = Javalin.create().start(7000);
         app.get("/", ctx -> ctx.result("Hello World"));
 
@@ -23,11 +31,15 @@ public class Server {
             }
         });
 
-
         app.routes(() -> {
-            get("/un-secured", ctx -> ctx.result("Hello"), roles(Roles.Public));
+            get("/register", inject(new RegisterRoute(), RegisterRoute.class), roles(Roles.Public));
+            get("/login", inject(new LoginRoute(), LoginRoute.class), roles(Roles.Public));
             get("/secured", ctx -> ctx.result("Hello"), roles(Roles.User));
         });
+    }
+
+    private <T> T inject(T entity, Class<?> clazz) {
+        return _injectable.inject(entity, clazz);
     }
 
     private static Roles getUserRole(Context ctx) {

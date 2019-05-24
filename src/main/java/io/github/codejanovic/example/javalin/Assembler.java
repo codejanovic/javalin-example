@@ -9,35 +9,34 @@ import io.github.codejanovic.example.javalin.repository.InMemoryUserRepository;
 import io.github.codejanovic.example.javalin.service.JwtAuthorizationService;
 import io.github.codejanovic.example.javalin.service.JwtLoginService;
 import io.github.codejanovic.example.javalin.service.SimpleRegistrationService;
-import org.jusecase.inject.Injector;
+import io.github.codejanovic.example.javalin.usecase.LoginUsecase;
+import io.github.codejanovic.example.javalin.usecase.RegisterUsecase;
 
 public class Assembler extends InjectUsecaseExecutor implements Injectable {
 
     public static final Assembler instance = new Assembler();
 
-    Injector _injector = Injector.getInstance();
 
 
     public Assembler() {
-        _injector.add(Secret.class);
-        _injector.add(new DateProvider.Default());
+        injector.addProvider(InjectableProvider.class);
+        injector.add(Secret.class);
+        injector.add(new DateProvider.Default());
 
-        _injector.add(InMemoryUserRepository.class);
+        injector.add(InMemoryUserRepository.class);
 
-        _injector.add(JwtAuthorizationService.class);
-        _injector.add(JwtLoginService.class);
+        injector.add(JwtAuthorizationService.class);
+        injector.add(JwtLoginService.class);
+        injector.add(SimpleRegistrationService.class);
 
-        _injector.add(SimpleRegistrationService.class);
+        addUsecase(RegisterUsecase.class);
+        addUsecase(LoginUsecase.class);
     }
 
     @Override
     public <T> T inject(final T entity, final Class<?> clazz) {
-        _injector.inject(entity, clazz);
+        injector.inject(entity, clazz);
         return entity;
     }
 
-
-    private void addInjectable() {
-        _injector.addProvider(InjectableProvider.class);
-    }
 }
