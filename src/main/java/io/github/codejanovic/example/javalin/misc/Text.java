@@ -25,9 +25,7 @@ public interface Text {
         abstract protected boolean isEqualTo(final String other);
 
         @Override
-        public int hashCode() {
-            return _value.hashCode();
-        }
+        abstract public int hashCode();
 
 
         @Override
@@ -46,6 +44,11 @@ public interface Text {
         protected boolean isEqualTo(final String other) {
             return _value != null ? _value.equals(other) : other == null;
         }
+
+        @Override
+        public int hashCode() {
+            return _value.hashCode();
+        }
     }
 
     class CaseInsensitive extends Abstract {
@@ -57,6 +60,11 @@ public interface Text {
         @Override
         protected boolean isEqualTo(final String other) {
             return _value != null ? _value.equalsIgnoreCase(other) : other == null;
+        }
+
+        @Override
+        public int hashCode() {
+            return _value.toLowerCase().hashCode();
         }
     }
 

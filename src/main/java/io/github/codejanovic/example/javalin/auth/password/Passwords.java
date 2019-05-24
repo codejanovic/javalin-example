@@ -6,6 +6,9 @@ public interface Passwords {
     String passwordRepeated();
 
     default boolean match() {
+        if (password() == null || passwordRepeated() == null || password().isEmpty()) {
+            return false;
+        }
         return password().equalsIgnoreCase(passwordRepeated());
     }
 
