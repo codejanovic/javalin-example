@@ -9,6 +9,6 @@ public class LoginRoute extends Route.Abstract {
     @Override
     protected void handleInternal(@NotNull final Context ctx) throws Exception {
         final LoginUsecase.LoginRequest usecaseRequest = ctx.bodyAsClass(LoginUsecase.LoginRequest.class);
-        ctx.json(_usecaseExecutor.execute(usecaseRequest));
+        ctx.json((Object) _usecaseExecutor.execute(usecaseRequest));
     }
 }

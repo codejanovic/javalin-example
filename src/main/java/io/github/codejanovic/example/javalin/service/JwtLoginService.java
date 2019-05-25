@@ -28,7 +28,7 @@ public class JwtLoginService implements LoginService {
         if (!registeredUser.isPresent()) {
             throw new UnauthorizedResponse("Login failed");
         }
-        final Password hashedPassword = new PBKDF2Password(passwordAsString, registeredUser.get().salt());
+        final Password hashedPassword = new PBKDF2Password(passwordAsString, registeredUser.get().password().salt());
         if (!hashedPassword.hash().equals(registeredUser.get().password().hash())) {
             throw new UnauthorizedResponse("Login failed");
         }

@@ -10,6 +10,7 @@ import io.javalin.Javalin;
 import javax.inject.Inject;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.post;
 import static io.javalin.security.SecurityUtil.roles;
 
 public class Server {
@@ -18,8 +19,7 @@ public class Server {
     Injectable _injectable;
 
     public void start() {
-        Javalin app = Javalin.create().start(7000);
-        app.get("/", ctx -> ctx.result("Hello World"));
+        Javalin app = Javalin.create();
 
         // Set the access-manager that Javalin should use
         app.accessManager((handler, ctx, permittedRoles) -> {
@@ -31,11 +31,13 @@ public class Server {
             }
         });
 
+        app.start();
         app.routes(() -> {
-            get("/register", inject(new RegisterRoute(), RegisterRoute.class), roles(Roles.Public));
-            get("/login", inject(new LoginRoute(), LoginRoute.class), roles(Roles.Public));
+            post("/register", inject(new RegisterRoute(), RegisterRoute.class), roles(Roles.Public));
+            post("/login", inject(new LoginRoute(), LoginRoute.class), roles(Roles.Public));
             get("/secured", ctx -> ctx.result("Hello"), roles(Roles.User));
         });
+
     }
 
     private <T> T inject(T entity, Class<?> clazz) {
