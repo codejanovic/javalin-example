@@ -2,6 +2,10 @@ package io.github.codejanovic.example.javalin;
 
 import io.github.codejanovic.example.javalin.auth.Roles;
 import io.github.codejanovic.example.javalin.auth.user.User;
+import io.github.codejanovic.example.javalin.errors.BadRequest;
+import io.github.codejanovic.example.javalin.errors.NotFound;
+import io.github.codejanovic.example.javalin.errors.ServiceUnavailable;
+import io.github.codejanovic.example.javalin.errors.Unauthorized;
 import io.github.codejanovic.example.javalin.inject.Injectable;
 import io.github.codejanovic.example.javalin.misc.Text;
 import io.github.codejanovic.example.javalin.routes.HelloAuthenticatedRoute;
@@ -15,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
-
 import java.util.Optional;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
@@ -47,7 +50,7 @@ public class Server {
         });
 
         app.requestLogger((ctx, timeMs) -> {
-            final String message = ctx.method() + " "  + ctx.path() + " took " + timeMs + " ms";
+            final String message = ctx.method() + " " + ctx.path() + " took " + timeMs + " ms -> " + ctx.status() + (ctx.status() >= 300 && !ctx.resultString().isEmpty() ? " - " + ctx.resultString() : "");
             if (ctx.status() >= 200 && ctx.status() < 400) {
                 _log.info(message);
             } else if (ctx.status() >= 400 && ctx.status() < 500) {
@@ -56,6 +59,20 @@ public class Server {
                 _log.error(message);
             }
 
+        });
+
+        app.exception(Exception.class, (e, ctx) -> {
+            if (e instanceof BadRequest) {
+                ctx.status(400).result(e.getMessage());
+            } else if (e instanceof NotFound) {
+                ctx.status(404).result(e.getMessage());
+            } else if (e instanceof ServiceUnavailable) {
+                ctx.status(503).result(e.getMessage());
+            } else if (e instanceof Unauthorized) {
+                ctx.status(401).result(e.getMessage());
+            } else {
+                ctx.status(500).result(e.getMessage());
+            }
         });
 
 
