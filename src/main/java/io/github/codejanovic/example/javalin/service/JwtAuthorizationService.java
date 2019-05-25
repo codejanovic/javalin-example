@@ -47,6 +47,11 @@ public class JwtAuthorizationService implements AuthorizationService {
     public Optional<User> authorize(final Text bearer) {
         final Token token = decode(bearer);
         final Text userId = token.userId();
+        return userId.isNullOrEmpty() ? Optional.empty(): _userRepository.findById(userId);
+    }
+
+    @Override
+    public Optional<User> get(final Text userId) {
         return _userRepository.findById(userId);
     }
 

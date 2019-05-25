@@ -6,8 +6,14 @@ import io.github.codejanovic.example.javalin.misc.Identifiable;
 
 
 public abstract class AbstractUser extends Identifiable.Abstract implements User {
-    private final Password _password;
-    private final Email _email;
+    protected final Password _password;
+
+    @Override
+    public MutableUser mutable() {
+        return new MutableUser(_email.asString(), email().asString());
+    }
+
+    protected final Email _email;
 
     protected AbstractUser(final Password password,
                            final Email email) {

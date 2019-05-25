@@ -8,4 +8,5 @@ import io.github.codejanovic.example.javalin.misc.Identifiable;
 public interface User extends Identifiable {
     Password password();
     Email email();
+    MutableUser mutable();
 }

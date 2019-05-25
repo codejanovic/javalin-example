@@ -2,14 +2,17 @@ package io.github.codejanovic.example.javalin;
 
 import io.github.codejanovic.example.javalin.auth.Roles;
 import io.github.codejanovic.example.javalin.auth.user.User;
-import io.github.codejanovic.example.javalin.errors.Unauthorized;
 import io.github.codejanovic.example.javalin.inject.Injectable;
 import io.github.codejanovic.example.javalin.misc.Text;
+import io.github.codejanovic.example.javalin.routes.HelloAuthenticatedRoute;
 import io.github.codejanovic.example.javalin.routes.LoginRoute;
 import io.github.codejanovic.example.javalin.routes.RegisterRoute;
 import io.github.codejanovic.example.javalin.service.AuthorizationService;
 import io.javalin.Context;
 import io.javalin.Javalin;
+import io.javalin.UnauthorizedResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 
@@ -21,6 +24,7 @@ import static io.javalin.security.SecurityUtil.roles;
 
 public class Server {
 
+    private static final Logger _log = LogManager.getLogger(Server.class);
     private static final String __authorizationHeader = "Authorization";
     private static final String __bearer = "Bearer ";
 
@@ -42,19 +46,38 @@ public class Server {
             }
         });
 
+        app.requestLogger((ctx, timeMs) -> {
+            final String message = ctx.method() + " "  + ctx.path() + " took " + timeMs + " ms";
+            if (ctx.status() >= 200 && ctx.status() < 400) {
+                _log.info(message);
+            } else if (ctx.status() >= 400 && ctx.status() < 500) {
+                _log.warn(message);
+            } else {
+                _log.error(message);
+            }
+
+        });
+
+
         app.start();
         app.routes(() -> {
             post("/register", inject(new RegisterRoute(), RegisterRoute.class), roles(Roles.Public));
             post("/login", inject(new LoginRoute(), LoginRoute.class), roles(Roles.Public));
-            get("/v1/hello", ctx -> ctx.result("Hello"), roles(Roles.User));
+            get("/v1/hello", inject(new HelloAuthenticatedRoute(), HelloAuthenticatedRoute.class), roles(Roles.User));
         });
 
+        app.before("/v1/*", this::authenticate);
     }
 
     private <T> T inject(T entity, Class<?> clazz) {
         return _injectable.inject(entity, clazz);
     }
 
+    private void authenticate(Context ctx) {
+       if (!getUserRole(ctx).isAuthenticated()) {
+            throw new UnauthorizedResponse("");
+       }
+    }
     private Roles getUserRole(Context ctx) {
         final Text authorizationHeader = new Text.CaseSensitive(ctx.req.getHeader(__authorizationHeader));
         if (authorizationHeader.isNullOrEmpty()) {
@@ -72,6 +95,5 @@ public class Server {
             return Roles.Public;
         }
     }
-
 }
 

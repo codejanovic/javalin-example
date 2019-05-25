@@ -16,6 +16,21 @@ public interface Email extends Identifiable, Text {
         public String asString() {
             return identifier().asString();
         }
+
+        @Override
+        public boolean startsWith(final String text) {
+            return identifier().startsWith(text);
+        }
+
+        @Override
+        public boolean endsWith(final String text) {
+            return identifier().endsWith(text);
+        }
+
+        @Override
+        public boolean contains(final String text) {
+            return identifier().contains(text);
+        }
     }
 
 

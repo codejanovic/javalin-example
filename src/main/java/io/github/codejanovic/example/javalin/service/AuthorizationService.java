@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface AuthorizationService {
     Token decode(final Text bearer);
     Optional<User> authorize(final Text bearer) ;
+    Optional<User> get(final Text userId) ;
     Text encode(final Token token);
 }

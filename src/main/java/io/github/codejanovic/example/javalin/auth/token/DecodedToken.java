@@ -10,7 +10,7 @@ public class DecodedToken implements Token {
 
     public DecodedToken(final DecodedJWT jwt) {
         final Claim claim = jwt == null ? null : jwt.getClaim("userId");
-        _userId = new Text.CaseInsensitive(claim == null ? "" : claim.asString());
+        _userId = new Text.CaseInsensitive(claim == null ? null : claim.asString());
     }
 
     @Override
