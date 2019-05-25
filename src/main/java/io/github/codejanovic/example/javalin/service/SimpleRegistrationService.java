@@ -3,6 +3,7 @@ package io.github.codejanovic.example.javalin.service;
 import io.github.codejanovic.example.javalin.auth.password.Passwords;
 import io.github.codejanovic.example.javalin.auth.token.UserToken;
 import io.github.codejanovic.example.javalin.auth.user.User;
+import io.github.codejanovic.example.javalin.errors.BadRequest;
 import io.github.codejanovic.example.javalin.misc.Text;
 import io.github.codejanovic.example.javalin.repository.UserRepository;
 import io.javalin.BadRequestResponse;
@@ -28,7 +29,7 @@ public class SimpleRegistrationService implements RegistrationService {
 
     private void validateOrThrow(final User user, final Passwords passwords) {
         if (passwords.notMatch()) {
-            throw new BadRequestResponse("passwords dont match!");
+            throw new BadRequest("passwords dont match!");
         }
     }
 

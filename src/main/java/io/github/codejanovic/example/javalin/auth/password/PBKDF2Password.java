@@ -1,6 +1,7 @@
 package io.github.codejanovic.example.javalin.auth.password;
 
 
+import io.github.codejanovic.example.javalin.errors.InternalServerError;
 import io.github.codejanovic.example.javalin.misc.Text;
 import io.github.codejanovic.example.javalin.misc.UuidText;
 
@@ -33,7 +34,7 @@ public final class PBKDF2Password extends AbstractPassword {
             byte[] hash = skf.generateSecret(spec).getEncoded();
             return iterations + ":" + toHex(salt) + ":" + toHex(hash);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new IllegalArgumentException(e);
+            throw new InternalServerError("Unable to generate password hash", e);
         }
     }
 

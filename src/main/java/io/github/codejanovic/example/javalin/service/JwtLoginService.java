@@ -6,6 +6,7 @@ import io.github.codejanovic.example.javalin.auth.password.PBKDF2Password;
 import io.github.codejanovic.example.javalin.auth.password.Password;
 import io.github.codejanovic.example.javalin.auth.token.UserToken;
 import io.github.codejanovic.example.javalin.auth.user.User;
+import io.github.codejanovic.example.javalin.errors.Unauthorized;
 import io.github.codejanovic.example.javalin.misc.Text;
 import io.github.codejanovic.example.javalin.repository.UserRepository;
 import io.javalin.UnauthorizedResponse;
@@ -26,11 +27,11 @@ public class JwtLoginService implements LoginService {
     public Text login(Email email, Text passwordAsString) {
         final Optional<User> registeredUser = _userRepository.findByEmail(email);
         if (!registeredUser.isPresent()) {
-            throw new UnauthorizedResponse("Login failed");
+            throw new Unauthorized("Login failed");
         }
         final Password hashedPassword = new PBKDF2Password(passwordAsString, registeredUser.get().password().salt());
         if (!hashedPassword.hash().equals(registeredUser.get().password().hash())) {
-            throw new UnauthorizedResponse("Login failed");
+            throw new Unauthorized("Login failed");
         }
 
         return _authorizationService.encode(new UserToken(registeredUser.get()));
