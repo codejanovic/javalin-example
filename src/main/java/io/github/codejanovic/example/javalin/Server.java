@@ -72,6 +72,7 @@ public class Server {
                 ctx.status(401).result(e.getMessage());
             } else {
                 ctx.status(500).result(e.getMessage());
+                _log.fatal("Oops, this was propably unintended", e);
             }
         });
 
